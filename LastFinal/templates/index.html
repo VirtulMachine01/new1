@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload</title>
+</head>
+<body>
+    <h1>Upload an Image</h1>
+    <form id="upload-form">
+        <input type="file" name="image" accept="image/*" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('upload-form');
+        form.onsubmit = async (e) => {
+            e.preventDefault(); // Prevent the default form submission
+            const formData = new FormData(form);
+            // console.log("Form data prepared for upload:", formData); // Debugging line
+
+            const uploadButton = document.querySelector('button[type="submit"]');
+            uploadButton.disabled = true; // Disable the button
+
+            try {
+                // console.log("Sending image upload request...");
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok Maybe Your Comuter is Busy: ' + response.statusText);
+                }
+
+                const data = await response.json(); // Parse the JSON response
+                // console.log('Data received from /api/upload:', data);
+
+                const jsonData = encodeURIComponent(JSON.stringify(data));
+                window.location.href = `/result?data=${jsonData}`;
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                alert('Error uploading image: ' + error.message);
+            } finally {
+                uploadButton.disabled = false; // Re-enable the button
+            }
+        };
+    });
+    </script>
+</body>
+</html>

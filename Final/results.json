@@ -1,0 +1,43 @@
+[
+    {
+        "image_id": "test2.jpg",
+        "image_caption_tokens": [
+            "yellow sign",
+            "background",
+            "white pole",
+            "street",
+            "blue car",
+            "white car",
+            "green tree",
+            "man"
+        ],
+        "image_ocr_text": "CRASHT"
+    },
+    {
+        "image_id": "test1.jpg",
+        "image_caption_tokens": [
+            "glass",
+            "building",
+            "several windows",
+            "side",
+            "background",
+            "road",
+            "white car",
+            "green tree",
+            "white and blue building"
+        ],
+        "image_ocr_text": "Brino Auto 01"
+    },
+    {
+        "image_id": "test6.jpg",
+        "image_caption_tokens": [
+            "white lines",
+            "side",
+            "road",
+            "red car",
+            "edge",
+            "brick building"
+        ],
+        "image_ocr_text": "2024-04-10 10:11:32-0500 AX0NB0DY3X60A4689Z"
+    }
+]
