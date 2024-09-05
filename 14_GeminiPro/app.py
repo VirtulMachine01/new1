@@ -41,6 +41,13 @@ st.set_page_config(page_title="Gemini Image Demo")
 
 st.header("Gemini Application")
 input=st.text_input("Input Prompt: ", key="input")
+# input = """
+# What is name?
+# What is DOB?
+# What is Gender?
+# What is Number?
+# Whch Document is this?
+# """
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
 image = ""
 if uploaded_file is not None:
@@ -49,6 +56,11 @@ if uploaded_file is not None:
 
 submit = st.button("Tell me about the invoice")
 
+# input_prompt="""
+# You are an expert in understanding Indian Documents like Aadhaar card and Pancard.
+# You will recieve input document as image.
+# and you will have to answer questions based on the input image.
+# """
 input_prompt="""
 You are an expert in understanding invoices. You will recieve input images as invoices 
 and you will have to answer questions based on the input image.
