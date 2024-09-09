@@ -132,15 +132,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
+# Above code is for only addhar multi prompt and below code is for mulyi prompt for automatic docment detection
 
 
 
@@ -254,6 +246,7 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption="Uploaded Image", use_column_width=True)
     
+    # vo image file wha pr honi chahia nhi to ye run nhi ho rha..wo change krna hai
     # Convert the uploaded file to bytes and process
     with open(uploaded_file.name, "wb") as f:
         f.write(uploaded_file.getbuffer())
@@ -271,7 +264,7 @@ if uploaded_file is not None:
         few_shot_examples = pan_few_shot_examples
         input_text = "Extract the name, DOB, PAN Number from the provided PAN card Document."
     else:
-        st.error("Unknown document type detected.")
+        st.error("Unknown document type detected Please Reattach the document with proper image.")
         st.stop()
 
     input_prompt = f"""
@@ -303,31 +296,8 @@ if uploaded_file is not None:
             st.write(response)
 
 
+# Improve the model
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#Improve the model
-
-# Try multishot prompting with document type
+# Try multishot prompting with document type (done for aadhar card and pan card)
 # finetune the model
 # Try with OCR
