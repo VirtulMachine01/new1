@@ -13,6 +13,25 @@ import google.generativeai as genai
 genai.configure(api_key = os.getenv("GOOGLE_API_KEY"))
 
 ##Function to load Gemini Pro vision model and get response
+# def get_gemini_response(input, image, prompt):
+#     model = genai.GenerativeModel('gemini-1.5-flash')
+#     try:
+#         response = model.generate_content([input, image[0], prompt])
+        
+#         # Check if the response was blocked due to safety ratings
+#         if response.candidates and response.candidates[0].content:
+#             return response.candidates[0].content.parts[0].text
+#         else:
+#             # Check safety ratings
+#             if response.candidates and response.candidates[0].safety_ratings:
+#                 safety_issues = [f"{rating.category}: {rating.probability}"
+#                                  for rating in response.candidates[0].safety_ratings
+#                                  if rating.probability != "NEGLIGIBLE"]
+#                 return f"Response blocked due to safety concerns: {', '.join(safety_issues)}"
+#             else:
+#                 return "No valid response generated. Please try again with a different prompt or image."
+#     except Exception as e:
+#         return f"An error occurred: {str(e)}"
 
 def get_gemini_response(input, image, prompt):
     model = genai.GenerativeModel('gemini-1.5-flash')
@@ -48,13 +67,14 @@ input=st.text_input("Input Prompt: ", key="input")
 # What is Number?
 # Whch Document is this?
 # """
+
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
 image = ""
 if uploaded_file is not None:
     image  = Image.open(uploaded_file)
     st.image(image, caption="Uploaded Image.", use_column_width=True)
 
-submit = st.button("Tell me about the invoice")
+submit = st.button("Tell me about the Invoice")
 
 # input_prompt="""
 # You are an expert in understanding Indian Documents like Aadhaar card and Pancard.
@@ -71,3 +91,24 @@ if submit:
     response = get_gemini_response(input_prompt, image_data, input)
     st.subheader("Answer : ")
     st.write(response)
+
+# if submit:
+#     image_data = input_image_setup(uploaded_file)
+#     response = get_gemini_response(input_prompt, image_data, input)
+    
+#     st.subheader("Response:")
+    
+#     if response is None:
+#         st.error("No valid response generated. Please give a proper prompt.")
+#     elif response.startswith("Response blocked due to safety concerns:"):
+#         st.warning("Change the prompt")
+#     elif response.startswith("An error occurred:"):
+#         st.error("Change the prompt")
+#     else:
+#         st.write(response)
+
+#Improve the model
+
+# Try multishot prompting
+# finetune the model
+# Try with OCR
