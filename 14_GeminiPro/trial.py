@@ -225,6 +225,7 @@ example_image2_base64 = encode_image_to_base64("sample_image2.jpeg")
 example_image3_base64 = encode_image_to_base64("sample_image3.jpeg")
 example_image4_base64 = encode_image_to_base64("sample_image5.jpeg")
 example_image5_base64 = encode_image_to_base64("pan0.jpeg")
+example_image6_base64 = encode_image_to_base64("guj2.jpeg")
 
 # Few-shot examples for Aadhaar card
 # aadhaar_few_shot_examples = f"""
@@ -248,12 +249,20 @@ Image (base64): {example_image5_base64}
 Output: {{ "name": "SANJAY KUMAR PRAJAPATI", "DOB": "02/06/1990", "PAN_Number": "BJQPP5524G"}}
 """
 
+# Few-shot examples for Birth Certificate
+birth_few_shot_examples = f"""
+Example 1:
+Input: Extract the name, DOB, gender, mother, father, birth_place from Indian Birth Certificate.
+Image (base64): {example_image5_base64}
+Output: {{ "name": "SWARA", "dob": "03/11/2022", "gender": "Female", "mother":"PRIYANKABEN", "father": "HITESHBHAI CHANDRAKANTBHAI CHAVDA", "birth_place": "G.M.ER.S(Civil Hospital) Junagadh"}}
+"""
+
 def classify_document(image_data):
     # Simple classification prompt
     classification_prompt = """
-    You are an expert in understanding Indian Documents like Aadhaar card and Pancard.
-    Identify whether the given document is an Aadhaar card or PAN card.
-    Give aadhar as output if it is AAdhar card or give pan if it is Pancard.
+    You are an expert in understanding Indian Documents like Aadhaar card and Pancard and Birth Certificate.
+    Identify whether the given document is an Aadhaar card or PAN card or Birth Certificate.
+    Give aadhar as output if it is AAdhar card or give pan if it is Pancard or give birth if it is birth certificate.
     """
     # Get the classification result
     classification_result = get_gemini_response(classification_prompt, image_data, "")
@@ -261,7 +270,7 @@ def classify_document(image_data):
 
 def main():
     # Manually provide the path to the image file
-    image_file_path = "Aadhaar_letter_large.png"  # Change this to your image file path
+    image_file_path = "eng0.jpeg"  # Change this to your image file path
     
     start_time = time.time()
 
@@ -287,13 +296,16 @@ def main():
     elif "pan" == document_type:
         few_shot_examples = pan_few_shot_examples
         input_text = "Extract the name, DOB, PAN Number from the provided PAN card Document."
+    elif "birth" == document_type:
+        few_shot_examples = birth_few_shot_examples
+        input_text = "Extract the name, DOB, gender, mother, father, birth_place from Indian Birth Certificate."
     else:
         print("Unknown document type detected. Please provide a proper image.")
         return 
 
     input_prompt = f"""
-    You are an expert in understanding Indian Documents like Aadhaar card and PAN card.
-    You will receive input document as image.
+    You are an expert in understanding Indian Documents like Aadhaar card and PAN card and Birth certificate.
+    You will receive input document as image in any Indian Language so extract the data as it is in the document without translating.
     You will have to answer questions based on the input image and provide the response in JSON format.
     Don't write json and ``` in the output. Only return the json.
 
