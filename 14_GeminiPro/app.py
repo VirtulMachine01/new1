@@ -12,31 +12,31 @@ import google.generativeai as genai
 ## Configuiring API Key
 genai.configure(api_key = os.getenv("GOOGLE_API_KEY"))
 
-##Function to load Gemini Pro vision model and get response
-# def get_gemini_response(input, image, prompt):
-#     model = genai.GenerativeModel('gemini-1.5-flash')
-#     try:
-#         response = model.generate_content([input, image[0], prompt])
-        
-#         # Check if the response was blocked due to safety ratings
-#         if response.candidates and response.candidates[0].content:
-#             return response.candidates[0].content.parts[0].text
-#         else:
-#             # Check safety ratings
-#             if response.candidates and response.candidates[0].safety_ratings:
-#                 safety_issues = [f"{rating.category}: {rating.probability}"
-#                                  for rating in response.candidates[0].safety_ratings
-#                                  if rating.probability != "NEGLIGIBLE"]
-#                 return f"Response blocked due to safety concerns: {', '.join(safety_issues)}"
-#             else:
-#                 return "No valid response generated. Please try again with a different prompt or image."
-#     except Exception as e:
-#         return f"An error occurred: {str(e)}"
-
+#Function to load Gemini Pro vision model and get response
 def get_gemini_response(input, image, prompt):
     model = genai.GenerativeModel('gemini-1.5-flash')
-    response = model.generate_content([input, image[0], prompt])
-    return response.text
+    try:
+        response = model.generate_content([input, image[0], prompt])
+        
+        # Check if the response was blocked due to safety ratings
+        if response.candidates and response.candidates[0].content:
+            return response.candidates[0].content.parts[0].text
+        else:
+            # Check safety ratings
+            if response.candidates and response.candidates[0].safety_ratings:
+                safety_issues = [f"{rating.category}: {rating.probability}"
+                                 for rating in response.candidates[0].safety_ratings
+                                 if rating.probability != "NEGLIGIBLE"]
+                return f"Response blocked due to safety concerns: {', '.join(safety_issues)}"
+            else:
+                return "No valid response generated. Please try again with a different prompt or image."
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
+
+# def get_gemini_response(input, image, prompt):
+#     model = genai.GenerativeModel('gemini-1.5-flash')
+#     response = model.generate_content([input, image[0], prompt])
+#     return response.text
 
 def input_image_setup(uploaded_file):
     if uploaded_file is not None:
@@ -76,15 +76,15 @@ if uploaded_file is not None:
 
 submit = st.button("Tell me about the Invoice")
 
-# input_prompt="""
-# You are an expert in understanding Indian Documents like Aadhaar card and Pancard.
-# You will recieve input document as image.
-# and you will have to answer questions based on the input image.
-# """
 input_prompt="""
-You are an expert in understanding invoices. You will recieve input images as invoices 
+You are an expert in understanding Indian Documents like Aadhaar card and Pancard.
+You will recieve input document as image.
 and you will have to answer questions based on the input image.
 """
+# input_prompt="""
+# You are an expert in understanding invoices. You will recieve input images as invoices 
+# and you will have to answer questions based on the input image.
+# """
 
 if submit:
     image_data = input_image_setup(uploaded_file)

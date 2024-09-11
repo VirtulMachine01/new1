@@ -254,7 +254,7 @@ birth_few_shot_examples = f"""
 Example 1:
 Input: Extract the name, DOB, gender, mother, father, birth_place from Indian Birth Certificate.
 Image (base64): {example_image5_base64}
-Output: {{ "name": "SWARA", "dob": "03/11/2022", "gender": "Female", "mother":"PRIYANKABEN", "father": "HITESHBHAI CHANDRAKANTBHAI CHAVDA", "birth_place": "G.M.ER.S(Civil Hospital) Junagadh"}}
+Output: {{ "name": "SWARA", "dob": "03/11/2022", "gender": "Female", "mother":"PRIYANKABEN", "father": "HITESHBHAI CHANDRAKANTBHAI CHAVDA", "birth_place": "G.M.E.R.S(Civil Hospital) Junagadh"}}
 """
 
 def classify_document(image_data):
@@ -270,7 +270,7 @@ def classify_document(image_data):
 
 def main():
     # Manually provide the path to the image file
-    image_file_path = "eng0.jpeg"  # Change this to your image file path
+    image_file_path = "guj2.jpeg"  # Change this to your image file path
     
     start_time = time.time()
 
