@@ -8,6 +8,8 @@ import streamlit as st
 import os
 from PIL import Image
 import google.generativeai as genai
+from google.generativeai.types import HarmCategory, HarmBlockThreshold
+import json
 
 ## Configuiring API Key
 genai.configure(api_key = os.getenv("GOOGLE_API_KEY"))
@@ -16,7 +18,16 @@ genai.configure(api_key = os.getenv("GOOGLE_API_KEY"))
 def get_gemini_response(input, image, prompt):
     model = genai.GenerativeModel('gemini-1.5-flash')
     try:
-        response = model.generate_content([input, image[0], prompt])
+        # response = model.generate_content([input, image[0], prompt])
+        response = model.generate_content(
+            [input, image[0], prompt],
+            safety_settings={
+                HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+                HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+                # HarmCategory.HARM_CATEGORY_DANGEROUS: HarmBlockThreshold.BLOCK_NONE,
+                HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+            }
+        )
         
         # Check if the response was blocked due to safety ratings
         if response.candidates and response.candidates[0].content:
@@ -72,25 +83,53 @@ uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg
 image = ""
 if uploaded_file is not None:
     image  = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Image.", use_column_width=True)
+    st.image(image, caption="Uploaded Image.", width=400)
 
-submit = st.button("Tell me about the Invoice")
+submit = st.button("Extract Details")
 
-input_prompt="""
-You are an expert in understanding Indian Documents like Aadhaar card and Pancard.
-You will recieve input document as image.
-and you will have to answer questions based on the input image.
+# input_prompt="""
+# You are an expert in understanding Indian Documents like Aadhaar card and Pancard.
+# You will recieve input document as image.
+# (Mostly Questions will be validating the iput data in the doccument..In that case
+# if document is aadhar card then aadhar number will be opf 12 digits and
+# if the document is pancard then the number will be of 10 character in that first 5 will be alphabets 
+# then next 4 will be of digits and last will be alphabet so when you are extracting the number
+# must check the note because number will not more then these character mentioned here.)
+# and you will have to answer questions based on the input image.
+# """
+
+
+input_prompt = """
+You are an expert in understanding Indian Documents like Aadhaar card and Pancard and birth certificates in any Indian Language.
+You will recieve input document as image and input text for question on input image document.
+Questions will based on the extraction of data from the image like name, dob, father's name, aadharnumber, pannumber or address etc.
+You have to give the json reponse of this details. please don't include any other text expect the json.
 """
+
 # input_prompt="""
 # You are an expert in understanding invoices. You will recieve input images as invoices 
 # and you will have to answer questions based on the input image.
 # """
+
+from deep_translator import GoogleTranslator
+def translate_text(text, dest_language='en'):
+    translator = GoogleTranslator(source='auto', target=dest_language)
+    translation = translator.translate(text)
+    return translation
 
 if submit:
     image_data = input_image_setup(uploaded_file)
     response = get_gemini_response(input_prompt, image_data, input)
     st.subheader("Answer : ")
     st.write(response)
+    try:
+        response_json = json.loads(response)
+        print("Extracted Information:")
+        print(json.dumps(response_json, indent=4))
+    except json.JSONDecodeError:
+        print("The response is not a valid JSON. Here is the response text:")
+        eng_res = translate_text(response)
+        st.write(eng_res)
 
 # if submit:
 #     image_data = input_image_setup(uploaded_file)
