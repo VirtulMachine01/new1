@@ -2,6 +2,7 @@ import streamlit as st
 from llm_chains import load_normal_chain
 from audio_handler import transcribe_audio
 from utils import save_chat_history_json, load_chat_history_json,get_timestamp
+from image_handler import handle_image
 from langchain_community.chat_message_histories import StreamlitChatMessageHistory
 from streamlit_mic_recorder import mic_recorder
 import yaml
@@ -69,17 +70,28 @@ def main():
         send_button = st.button("Ask", key="send_button", on_click=clear_input_field)
 
     uploaded_audio = st.sidebar.file_uploader("or upload an audio file", type = ["wav", "mp3", "ogg", "flac"])
+    uploaded_image = st.sidebar.file_uploader("or upload an image file", type = ["jpg", "jpeg", "png", "flac"])
     if uploaded_audio:
-        transcribe_audio = transcribe_audio(uploaded_audio.getvalue())
+        transcribed_audio = transcribe_audio(uploaded_audio.getvalue())
         print(transcribe_audio)
-        llm_chain.run("Summarize this audio" + transcribe_audio)
+        llm_chain.run("Summarize this audio" + transcribed_audio)
 
     if voice_recording:
-        transcribe_audio = transcribe_audio(voice_recording["bytes"])
+        transcribed_audio = transcribe_audio(voice_recording["bytes"])
         print(transcribe_audio)
-        llm_chain.run(transcribe_audio)
+        llm_chain.run(transcribed_audio)
 
     if send_button or st.session_state.send_input:
+        if uploaded_image:
+            with st.spinner("Processing Image..."):
+                user_message = "Describe this image in detail please."
+                if st.session_state.user_question != "":
+                    user_message = st.session_state.user_question
+                    st.session_state.user_question=""
+                llm_answer = handle_image(uploaded_image.getvalue(), st.session_state.user_question)
+                chat_history.add_user_message(user_message)
+                chat_history.add_ai_message(llm_answer)
+                
         if st.session_state.user_question != "":
             llm_response = llm_chain.run(st.session_state.user_question)
             st.session_state.user_question = ""

@@ -1,2 +1,3 @@
 newVenv
 Chat_All/models/*.gguf
+Chat_All/models/llava/*.gguf

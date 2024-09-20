@@ -1,3 +1,4 @@
 Embeddings link - https://huggingface.co/spaces/mteb/leaderboard
 Model link - https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF
 whisper model - https://huggingface.co/openai/whisper-large-v3
+llava models - https://huggingface.co/mys/ggml_llava-v1.5-7b/tree/main
