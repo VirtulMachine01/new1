@@ -30,7 +30,7 @@ def save_chat_history():
             save_chat_history_json(st.session_state.history, config["chat_history_path"] + st.session_state.session_key)
 
 def main():
-    st.title("Chitra Vani")
+    st.title("ChitraVani")
     # st.write(css, unsafe_allow_html=True)
     chat_container = st.container()
     st.sidebar.title("Chat Sessions")

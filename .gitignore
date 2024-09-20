@@ -1,1 +1,3 @@
 newVenv
+Chat_All/models/mistral-7b-instruct-v0.2.Q3_K_M.gguf
+Chat_All/models/mistral-7b-instruct-v0.2.Q5_K_M.gguf
