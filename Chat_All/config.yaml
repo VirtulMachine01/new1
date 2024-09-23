@@ -6,6 +6,7 @@ model_type : "mistral"
 
 # embeddings_path: "BAAI/bge-large-en-v1.5"
 embeddings_path: "dunzhang/stella_en_1.5B_v5"
+embedding_name: "sentence-transformers/all-MiniLM-l6-v2"
 
 model_config: 
   'max_new_tokens' : 512
@@ -14,3 +15,5 @@ model_config:
   'gpu_layers' : 0
 
 chat_history_path: './chat_sessions/'
+vectordb_path: './faiss_db/'
+temp_pdf_path: './pdfs/'

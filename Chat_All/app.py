@@ -1,8 +1,10 @@
 import streamlit as st
-from llm_chains import load_normal_chain
+from llm_chains import load_normal_chain, load_pdf_chat_chain
 from audio_handler import transcribe_audio
 from utils import save_chat_history_json, load_chat_history_json,get_timestamp
 from image_handler import handle_image
+from pdf_handler import add_documents_to_db
+from html_templates import css, get_bot_template, get_user_template
 from langchain_community.chat_message_histories import StreamlitChatMessageHistory
 from streamlit_mic_recorder import mic_recorder
 import yaml
@@ -11,6 +13,8 @@ with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 def load_chain(chat_history):
+    if st.session_state.pdf_chat:
+        return load_pdf_chat_chain(chat_history)
     return load_normal_chain(chat_history)
 
 def clear_input_field():
@@ -24,6 +28,9 @@ def set_send_input():
 def track_index():
     st.session_state.session_index_tracker = st.session_state.session_key
 
+def toggle_pdf_chat():
+    st.session_state.pdf_chat = True
+
 def save_chat_history():
     if st.session_state.history != []:
         if st.session_state.session_key == "new_session":
@@ -34,8 +41,8 @@ def save_chat_history():
 
 def main():
     st.title("ChitraVani")
-    # st.write(css, unsafe_allow_html=True)
-    chat_container = st.container()
+    st.write(css, unsafe_allow_html=True)
+    # chat_container = st.container()
     st.sidebar.title("Chat Sessions")
     chat_sessions = ["new_session"] + os.listdir(config["chat_history_path"])
 
@@ -51,6 +58,7 @@ def main():
 
     index = chat_sessions.index(st.session_state.session_index_tracker)
     st.sidebar.selectbox("Select a Session", chat_sessions, key="session_key", index=index, on_change=track_index)
+    st.sidebar.toggle("PDF Chat", key = "pdf_chat", value=False)
 
     if st.session_state.session_key != "new_session":
         st.session_state.history = load_chat_history_json(config["chat_history_path"] + st.session_state.session_key)
@@ -63,7 +71,11 @@ def main():
 
     user_input = st.text_input("Type your question here", key="user_input", on_change=set_send_input)
 
-    voice_recording_column, send_button_column = st.columns(2)
+    col1, voice_recording_column, send_button_column = st.columns([1, 1, 1])
+
+    chat_container = st.container()
+    with col1:
+        pass
     with voice_recording_column:
         voice_recording = mic_recorder(start_prompt="Start recording", stop_prompt="Stop Recording", just_once=True)
     with send_button_column:
@@ -71,6 +83,12 @@ def main():
 
     uploaded_audio = st.sidebar.file_uploader("or upload an audio file", type = ["wav", "mp3", "ogg", "flac"])
     uploaded_image = st.sidebar.file_uploader("or upload an image file", type = ["jpg", "jpeg", "png", "flac"])
+    uploaded_pdf = st.sidebar.file_uploader("or upload a pdf file", accept_multiple_files=True, key="pdf_upload", type = ["pdf"], on_change=toggle_pdf_chat)
+
+    if uploaded_pdf:
+        with st.spinner("Processing pdf..."):
+            add_documents_to_db(uploaded_pdf)
+
     if uploaded_audio:
         transcribed_audio = transcribe_audio(uploaded_audio.getvalue())
         print(transcribe_audio)
@@ -91,7 +109,7 @@ def main():
                 llm_answer = handle_image(uploaded_image.getvalue(), st.session_state.user_question)
                 chat_history.add_user_message(user_message)
                 chat_history.add_ai_message(llm_answer)
-                
+
         if st.session_state.user_question != "":
             llm_response = llm_chain.run(st.session_state.user_question)
             st.session_state.user_question = ""
@@ -100,8 +118,12 @@ def main():
     if chat_history.messages != []:
         with chat_container:
             st.write("Chat History : ")
-            for msg in chat_history.messages:
-                st.chat_message(msg.type).write(msg.content)
+            for msg in reversed(chat_history.messages):
+                if msg.type == "human":
+                    st.write(get_user_template(msg.content), unsafe_allow_html=True)
+                elif msg.type == "ai":
+                    st.write(get_bot_template(msg.content), unsafe_allow_html=True)
+                # st.chat_message(msg.type).write(msg.content)
     save_chat_history()
     
 

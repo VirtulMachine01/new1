@@ -29,3 +29,17 @@ def handle_image(image_bytes, user_message):
     )
     print(output)
     return output["choices"][0]["message"]["content"]
+
+def convert_img_to_base64(image_path):
+    with open(image_path, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
+        return "data:image/jpeg;base64,"+encoded_string
+    
+def generate_Img_txt_base64(image_path):
+    img = convert_img_to_base64(image_path=image_path)
+    with open("icons/txt/image2.txt", "w")as f:
+        f.write(img)
+
+# if __name__ == "__main__":
+    # generate_Img_txt_base64("icons/user_image.png")
+    # generate_Img_txt_base64("icons/bot_image.png")
